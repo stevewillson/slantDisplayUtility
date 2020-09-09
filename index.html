@@ -1,0 +1,242 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Slant Display Utility</title>
+        <script type="text/javascript">
+
+            function draw(){
+                var canvas = document.getElementById("slantCanvas");
+                var ctx = canvas.getContext("2d");        
+
+                // fill in the Slant Details here!!!
+                drawTeamText("Team XXX", 80, 180);
+
+                // draw a circle with the SE / ME status
+                // the number represents the personnel available(?)
+                drawSE(10);
+                drawME1(9);
+                drawME2(8);
+                drawME3(1);
+
+                // draw remote connection status on the right
+                // each box is 50 wide x 30 high
+                // 0 - Black
+                // 1 - Red
+                // 2 - Yellow
+                // 3 - Green
+                drawBoxStaus(3, "RC 1", 120, 0);
+                drawBoxStaus(2, "RC 2", 120, 30);
+                drawBoxStaus(0, "RC 3", 120, 60);    
+
+                // draw DDS-M status below
+                drawBoxStaus(2, "DDS-M 1", 20, 100);
+                drawBoxStaus(3, "DDS-M 2", 70, 100);
+                drawBoxStaus(1, "DDS-M 3", 120, 100);
+            }
+
+            function drawTeamText(text, x, y){
+                var canvas = document.getElementById("slantCanvas");
+                var ctx = canvas.getContext("2d");
+
+                ctx.beginPath();
+                ctx.strokeText(text, x, y);
+            }
+
+            function drawSE(personnel){
+                // draw an arc that is colored based on the percent of personnel
+                var canvas = document.getElementById("slantCanvas");
+                var ctx = canvas.getContext("2d");
+
+                // there are only 10 options for the colors! Don't do anything fancy, just use an array of the possible colors
+                // 0 - BLACK
+                // 1-7 - RED
+                // 8-9 - YELLOW
+                // 10-12 - GREEN
+                var colors = ["#000000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFFF00","#FFFF00","#00FF00","#00FF00","#00FF00"];
+
+                var x = 50;
+                var y = 50;
+
+                var radius = 30;
+
+                // different for each ME startAngle / endAngle
+             
+                var startAngle = Math.PI * 1;
+                var endAngle = Math.PI * 1.5;
+                var anticlockwise = false;
+                ctx.fillStyle = colors[personnel];
+                // draw a 'slice of pie' arc
+                ctx.beginPath();
+                ctx.moveTo(x,y);
+                ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+                ctx.lineTo(x,y);
+                ctx.fill();
+
+                // draw text on top of the pie slice
+
+                // different for each ME location of text
+                ctx.font = "12px serif";
+                ctx.strokeText(personnel, x - radius/2, y - radius/2);
+                ctx.strokeText("SE", x - 1.5 * radius, y - radius);
+
+            }
+
+            // draw an arc for each section of the ME
+            // go from red to green based on the manning
+            function drawME1(personnel){
+                // draw an arc that is colored based on the percent of personnel
+                var canvas = document.getElementById("slantCanvas");
+                var ctx = canvas.getContext("2d");
+
+                // there are only 10 options for the colors! Don't do anything fancy, just use an array of the possible colors
+                // 0 - BLACK
+                // 1-5 - RED
+                // 6-7 - YELLOW
+                // 8-9 - GREEN
+                var colors = ["#000000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFFF00","#FFFF00","#00FF00","#00FF00"];
+
+                var x = 50;
+                var y = 50;
+
+                var radius = 30;
+
+                // different for each ME startAngle / endAngle
+             
+                var startAngle = Math.PI * 1.5;
+                var endAngle = Math.PI * 0;
+                var anticlockwise = false;
+                ctx.fillStyle = colors[personnel];
+                // draw a 'slice of pie' arc
+                ctx.beginPath();
+                ctx.moveTo(x,y);
+                ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+                ctx.lineTo(x,y);
+                ctx.fill();
+
+                // draw text on top of the pie slice
+
+                // different for each ME location of text
+                ctx.font = "12px serif";
+                ctx.strokeText(personnel, x + radius/2, y - radius/2);
+                ctx.strokeText("ME1", x + radius, y - radius);
+            }
+
+            function drawME2(personnel){
+                // draw an arc that is colored based on the percent of personnel
+                var canvas = document.getElementById("slantCanvas");
+                var ctx = canvas.getContext("2d");
+
+                // there are only 10 options for the colors! Don't do anything fancy, just use an array of the possible colors
+                // 0 - BLACK
+                // 1-5 - RED
+                // 6-7 - YELLOW
+                // 8-9 - GREEN
+                var colors = ["#000000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFFF00","#FFFF00","#00FF00","#00FF00"];
+
+                var x = 50;
+                var y = 50;
+
+                var radius = 30;
+
+                // different for each ME startAngle / endAngle / anticlockwise
+             
+                var startAngle = 0;
+                var endAngle = Math.PI * 0.5;
+                var anticlockwise = false;
+                ctx.fillStyle = colors[personnel];
+                // draw a 'slice of pie' arc
+
+                ctx.beginPath();
+                ctx.moveTo(x,y);
+                ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+                ctx.lineTo(x,y);
+                ctx.fill();
+
+                // draw text on top of the pie slice
+
+                // different for each ME location of text
+                ctx.font = "12px serif";
+                ctx.strokeText(personnel, x + radius/2, y + radius/2);
+                ctx.strokeText("ME2", x + radius, y + radius);
+            }
+
+            function drawME3(personnel){
+                // draw an arc that is colored based on the percent of personnel
+                var canvas = document.getElementById("slantCanvas");
+                var ctx = canvas.getContext("2d");
+
+                // there are only 10 options for the colors! Don't do anything fancy, just use an array of the possible colors
+                // 0 - BLACK
+                // 1-5 - RED
+                // 6-7 - YELLOW
+                // 8-9 - GREEN
+                var colors = ["#000000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFFF00","#FFFF00","#00FF00","#00FF00"];
+
+                var x = 50;
+                var y = 50;
+
+                var radius = 30;
+
+                // different for each ME startAngle / endAngle
+             
+                var startAngle = Math.PI * 0.5;
+                var endAngle = Math.PI * 1;
+                var anticlockwise = false;
+                ctx.fillStyle = colors[personnel];
+                // draw a 'slice of pie' arc
+                ctx.beginPath();
+                ctx.moveTo(x,y);
+                ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+                ctx.lineTo(x,y);
+                ctx.fill();
+
+                // draw text on top of the pie slice
+
+                // different for each ME location of text
+                ctx.font = "12px serif";
+                ctx.strokeText(personnel, x - radius/2, y + radius/2);
+                ctx.strokeText("ME3", x - 1.5 * radius, y + radius);
+            }
+
+            function drawBoxStaus(status, text, x, y){
+                // draw a box with some text that shows a status
+                var canvas = document.getElementById("slantCanvas");
+                var ctx = canvas.getContext("2d");
+
+                // there are 4 options for the colors! Don't do anything fancy, just use an array of the possible colors
+                // 0 - BLACK
+                // 1 - RED
+                // 2 - YELLOW
+                // 3 - GREEN
+                var colors = ["#000000","#FF0000","#FFFF00","#00FF00"];
+
+                //var x = 100;
+                //var y = 50;
+
+                var width = 50;
+                var height = 30;
+
+                ctx.fillStyle = colors[status];
+                // draw a 'slice of pie' arc
+                ctx.beginPath();
+                ctx.moveTo(x,y);
+                ctx.fillRect(x, y, width, height);
+                ctx.fill();
+
+                // draw text on top of conn status
+
+                // different for each ME location of text
+                ctx.font = "12px serif";
+                ctx.strokeText(text, x, y + height/2);
+            }
+        </script>
+        <style type="text/css">
+            canvas { border: 1px solid black; }
+        </style>
+    </head>
+    <body onload="draw();">
+        <p>Example Slant</p>
+        <canvas id="slantCanvas", width="200" height="200">
+        </canvas>
+    </body>
+</html>
