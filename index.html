@@ -1,242 +1,201 @@
 <html>
     <head>
         <meta charset="utf-8" />
+        <!-- used for refreshing the page every second for aligning boxes-->
+        <!--<meta http-equiv="refresh" content="1" >-->
         <title>Slant Display Utility</title>
+
         <script type="text/javascript">
 
-            function draw(){
-                var canvas = document.getElementById("slantCanvas");
-                var ctx = canvas.getContext("2d");        
+            function drawSlant(canvasId, element, assignedPax, availablePax, tngComplete, jqrComplete, valexDate, ops, c2Num, seNum, me1Num, me2Num, me3Num, ddsmNum, ddiNum, eckNum, rcNum){
+                var canvas = document.getElementById(canvasId);
+                var ctx = canvas.getContext("2d");
+
+                var manning = `${assignedPax} / ${availablePax} / ${tngComplete} / ${jqrComplete}`;
 
                 // fill in the Slant Details here!!!
-                drawTeamText("Team XXX", 80, 180);
+                drawText(canvasId, `Team: ${element}`, 5, 15);
+                drawText(canvasId, `Manning: ${manning}`, 5, 30);
+                drawText(canvasId, `VALEX: ${valexDate}`, 5, 45);
+                drawText(canvasId, `OPs: ${ops}`, 5, 60);
 
-                // draw a circle with the SE / ME status
-                // the number represents the personnel available(?)
-                drawSE(10);
-                drawME1(9);
-                drawME2(8);
-                drawME3(1);
+                // this is where definitions of the results can be used, they should follow a general red < 80%, yellow < 80%, green <= 100%
+                // programatically choose the colors to create the chart, we don't need to argue about definitions because the definitions are
+                // coded into the display utility 
 
-                // draw remote connection status on the right
-                // each box is 50 wide x 30 high
-                // 0 - Black
-                // 1 - Red
-                // 2 - Yellow
-                // 3 - Green
-                drawBoxStaus(3, "RC 1", 120, 0);
-                drawBoxStaus(2, "RC 2", 120, 30);
-                drawBoxStaus(0, "RC 3", 120, 60);    
+                // there are only 5 options for the colors! Don't do anything fancy, just use an array of the possible colors
+                // 0 - BLACK
+                // 1-2 - RED
+                // 3 - YELLOW
+                // 4 - GREEN
+                var c2Colors = ['black','red','red','yellow','green'];
 
-                // draw DDS-M status below
-                drawBoxStaus(2, "DDS-M 1", 20, 100);
-                drawBoxStaus(3, "DDS-M 2", 70, 100);
-                drawBoxStaus(1, "DDS-M 3", 120, 100);
+                // there are only 13 options for the colors! Don't do anything fancy, just use an array of the possible colors
+                // 0 - BLACK
+                // 1-7 - RED
+                // 8-9 - YELLOW
+                // 10-12 - GREEN
+                //var seColors = ['black','red','red','red','red','red','red','red','yellow','yellow','green','green','green'];
+
+                // there are only 9 options for the colors! Don't do anything fancy, just use an array of the possible colors
+                // 0 - BLACK
+                // 1-7 - RED
+                // 8-9 - YELLOW
+                // 10-12 - GREEN
+                var seColors = ['black','red','red','red','red','red','yellow','yellow','green','green'];
+
+                // there are only 10 options for the colors! Don't do anything fancy, just use an array of the possible colors
+                // 0 - BLACK
+                // 1-5 - RED
+                // 6-7 - YELLOW
+                // 8-9 - GREEN
+                var meColors = ['black','red','red','red','red','red','yellow','yellow','green','green'];
+                
+                // there are 4 options for the colors! Don't do anything fancy, just use an array of the possible colors
+                // 0 - BLACK
+                // 1 - RED
+                // 2 - YELLOW
+                // 3 - GREEN
+                var fourColors = ['black','red','yellow','green'];
+
+                var x1 = 15;
+                var y1 = 70;
+                var width1 = 35;
+                var height1 = 30;
+
+                drawTextWithStatusBg(canvasId, "C2", c2Num, c2Colors, x1, y1, width1, height1);
+                drawTextWithStatusBg(canvasId, "SE", seNum, seColors, x1 + 35, y1, width1, height1);
+                drawTextWithStatusBg(canvasId, "ME1", me1Num, meColors, x1, y1 + 30, width1, height1);
+                drawTextWithStatusBg(canvasId, "ME2", me2Num, meColors, x1 + 35, y1 + 30, width1, height1);
+                drawTextWithStatusBg(canvasId, "ME3", me3Num, meColors, x1 + 70, y1 + 30, width1, height1);
+
+                var x2 = 140;
+                var y2 = 15;
+                var width2 = 60;
+                var height2 = 30;
+
+                drawTextWithStatusBg(canvasId, `DDS-M: ${ddsmNum}`, ddsmNum, fourColors, x2, y2, width2, height2);
+                drawTextWithStatusBg(canvasId, `DDI: ${ddiNum}`, ddiNum, fourColors, x2, y2 + 30, width2, height2);
+                drawTextWithStatusBg(canvasId, `ECK: ${eckNum}`, eckNum, fourColors, x2, y2 + 60, width2, height2);
+                drawTextWithStatusBg(canvasId, `RC: ${rcNum}`, rcNum, fourColors, x2, y2 + 90, width2, height2);
             }
 
-            function drawTeamText(text, x, y){
-                var canvas = document.getElementById("slantCanvas");
+            function drawTextWithStatusBg(canvasId, text, colorIndex, bgColorArray, x, y, width, height){
+                // input text and draw a box with a specific color behind it
+                // the colorIndex is the 'status' number, it will use that to index into the bgColorArray
+                // x and y are the horizontal and vertical offset of the upper left corner of the box
+                // width and height are the dimensions of the box
+
+                var canvas = document.getElementById(canvasId);
+                var ctx = canvas.getContext("2d");
+
+                ctx.fillStyle = bgColorArray[colorIndex];
+                // draw a rectangle with a specified color
+                ctx.beginPath();
+                ctx.moveTo(x,y);
+                ctx.fillRect(x, y, width, height);
+                ctx.fill();
+
+                // overlay text on top of color block
+                ctx.font = "12px serif";
+                // add 2px to x to give slight offset, add the text height to y then divide by 2 to vertically center the text
+                ctx.strokeText(text, x + 2, y + (height+6)/2);
+            }
+
+            function drawText(canvasId, text, x, y){
+                var canvas = document.getElementById(canvasId);
                 var ctx = canvas.getContext("2d");
 
                 ctx.beginPath();
                 ctx.strokeText(text, x, y);
             }
 
-            function drawSE(personnel){
-                // draw an arc that is colored based on the percent of personnel
-                var canvas = document.getElementById("slantCanvas");
-                var ctx = canvas.getContext("2d");
+            var readFile = function () {
+                var fileInput = document.getElementById("csvInput");
+                var reader = new FileReader();
+                reader.onload = function() {
+                    // parse the CSV contents
+                    // detect how many rows
+                    // draw 1 slant per row
+                    var csvJson = csvJSON(reader.result);
+                    drawAllSlant(csvJson);
+                };
+                // start reading the file. When it is done, calls the onload event defined above.
+                reader.readAsBinaryString(fileInput.files[0]);
+            };
 
-                // there are only 10 options for the colors! Don't do anything fancy, just use an array of the possible colors
-                // 0 - BLACK
-                // 1-7 - RED
-                // 8-9 - YELLOW
-                // 10-12 - GREEN
-                var colors = ["#000000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFFF00","#FFFF00","#00FF00","#00FF00","#00FF00"];
+            function drawAllSlant(inputData){
 
-                var x = 50;
-                var y = 50;
+                // draw 1 slant per json object
 
-                var radius = 30;
+                // specify the number of slants to draw per row
+                var tableWidth = 5;
 
-                // different for each ME startAngle / endAngle
-             
-                var startAngle = Math.PI * 1;
-                var endAngle = Math.PI * 1.5;
-                var anticlockwise = false;
-                ctx.fillStyle = colors[personnel];
-                // draw a 'slice of pie' arc
-                ctx.beginPath();
-                ctx.moveTo(x,y);
-                ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
-                ctx.lineTo(x,y);
-                ctx.fill();
+                // create a table
+                var slantTable = document.createElement('table');
+                document.body.appendChild(slantTable);
+                var row = slantTable.insertRow();
+                var index = 0;
 
-                // draw text on top of the pie slice
+                for (let slant of JSON.parse(inputData)) {
 
-                // different for each ME location of text
-                ctx.font = "12px serif";
-                ctx.strokeText(personnel, x - radius/2, y - radius/2);
-                ctx.strokeText("SE", x - 1.5 * radius, y - radius);
+                    index = index + 1
+                    // skip over lines that are not filled out
+                    if (Object.keys(slant).length < 2){
+                        continue;
+                    }
 
+                    // check if the table width is exceeded, insert a new row
+                    if (index > tableWidth){
+                        row = slantTable.insertRow();
+                        index = 0;
+                    }
+
+                    var canvName = slant.team;
+                    var slantCanvas = document.createElement('canvas');
+                    slantCanvas.id = canvName;
+                    slantCanvas.width = 220;
+                    slantCanvas.height = 150;
+                    slantCanvas.style.margin = '5px 5px 5px 5px';
+
+                    var cell = row.insertCell();
+                    cell.appendChild(slantCanvas);
+                    drawSlant(canvName, slant.team, slant.assignedPax, slant.availablePax, slant.tngComplete, slant.jqrComplete, slant.valex, slant.ops, slant.c2, slant.se, slant.me1, slant.me2, slant.me3, slant["DDS-M"], slant.DDI, slant.ECK, slant.RC);
+                }
             }
 
-            // draw an arc for each section of the ME
-            // go from red to green based on the manning
-            function drawME1(personnel){
-                // draw an arc that is colored based on the percent of personnel
-                var canvas = document.getElementById("slantCanvas");
-                var ctx = canvas.getContext("2d");
+            // convert the csv to json
+            function csvJSON(csv){
 
-                // there are only 10 options for the colors! Don't do anything fancy, just use an array of the possible colors
-                // 0 - BLACK
-                // 1-5 - RED
-                // 6-7 - YELLOW
-                // 8-9 - GREEN
-                var colors = ["#000000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFFF00","#FFFF00","#00FF00","#00FF00"];
+                // handle Windows CSV with a \n\r for a newline character, remove the \r
+                var csvNoCr = csv.replace(/\r/g,"");
+                var lines=csvNoCr.split("\n");
+                var result = [];
+                var headers=lines[0].split(",");
 
-                var x = 50;
-                var y = 50;
+                for(var i=1;i<lines.length;i++){
 
-                var radius = 30;
+                    var obj = {};
+                    var currentline=lines[i].split(",");
 
-                // different for each ME startAngle / endAngle
-             
-                var startAngle = Math.PI * 1.5;
-                var endAngle = Math.PI * 0;
-                var anticlockwise = false;
-                ctx.fillStyle = colors[personnel];
-                // draw a 'slice of pie' arc
-                ctx.beginPath();
-                ctx.moveTo(x,y);
-                ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
-                ctx.lineTo(x,y);
-                ctx.fill();
+                    for(var j=0;j<headers.length;j++){
+                        obj[headers[j]] = currentline[j];
+                    }
 
-                // draw text on top of the pie slice
-
-                // different for each ME location of text
-                ctx.font = "12px serif";
-                ctx.strokeText(personnel, x + radius/2, y - radius/2);
-                ctx.strokeText("ME1", x + radius, y - radius);
+                    result.push(obj);
+                }
+                //return result; //JavaScript object
+                return JSON.stringify(result);
             }
 
-            function drawME2(personnel){
-                // draw an arc that is colored based on the percent of personnel
-                var canvas = document.getElementById("slantCanvas");
-                var ctx = canvas.getContext("2d");
-
-                // there are only 10 options for the colors! Don't do anything fancy, just use an array of the possible colors
-                // 0 - BLACK
-                // 1-5 - RED
-                // 6-7 - YELLOW
-                // 8-9 - GREEN
-                var colors = ["#000000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFFF00","#FFFF00","#00FF00","#00FF00"];
-
-                var x = 50;
-                var y = 50;
-
-                var radius = 30;
-
-                // different for each ME startAngle / endAngle / anticlockwise
-             
-                var startAngle = 0;
-                var endAngle = Math.PI * 0.5;
-                var anticlockwise = false;
-                ctx.fillStyle = colors[personnel];
-                // draw a 'slice of pie' arc
-
-                ctx.beginPath();
-                ctx.moveTo(x,y);
-                ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
-                ctx.lineTo(x,y);
-                ctx.fill();
-
-                // draw text on top of the pie slice
-
-                // different for each ME location of text
-                ctx.font = "12px serif";
-                ctx.strokeText(personnel, x + radius/2, y + radius/2);
-                ctx.strokeText("ME2", x + radius, y + radius);
-            }
-
-            function drawME3(personnel){
-                // draw an arc that is colored based on the percent of personnel
-                var canvas = document.getElementById("slantCanvas");
-                var ctx = canvas.getContext("2d");
-
-                // there are only 10 options for the colors! Don't do anything fancy, just use an array of the possible colors
-                // 0 - BLACK
-                // 1-5 - RED
-                // 6-7 - YELLOW
-                // 8-9 - GREEN
-                var colors = ["#000000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFFF00","#FFFF00","#00FF00","#00FF00"];
-
-                var x = 50;
-                var y = 50;
-
-                var radius = 30;
-
-                // different for each ME startAngle / endAngle
-             
-                var startAngle = Math.PI * 0.5;
-                var endAngle = Math.PI * 1;
-                var anticlockwise = false;
-                ctx.fillStyle = colors[personnel];
-                // draw a 'slice of pie' arc
-                ctx.beginPath();
-                ctx.moveTo(x,y);
-                ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
-                ctx.lineTo(x,y);
-                ctx.fill();
-
-                // draw text on top of the pie slice
-
-                // different for each ME location of text
-                ctx.font = "12px serif";
-                ctx.strokeText(personnel, x - radius/2, y + radius/2);
-                ctx.strokeText("ME3", x - 1.5 * radius, y + radius);
-            }
-
-            function drawBoxStaus(status, text, x, y){
-                // draw a box with some text that shows a status
-                var canvas = document.getElementById("slantCanvas");
-                var ctx = canvas.getContext("2d");
-
-                // there are 4 options for the colors! Don't do anything fancy, just use an array of the possible colors
-                // 0 - BLACK
-                // 1 - RED
-                // 2 - YELLOW
-                // 3 - GREEN
-                var colors = ["#000000","#FF0000","#FFFF00","#00FF00"];
-
-                //var x = 100;
-                //var y = 50;
-
-                var width = 50;
-                var height = 30;
-
-                ctx.fillStyle = colors[status];
-                // draw a 'slice of pie' arc
-                ctx.beginPath();
-                ctx.moveTo(x,y);
-                ctx.fillRect(x, y, width, height);
-                ctx.fill();
-
-                // draw text on top of conn status
-
-                // different for each ME location of text
-                ctx.font = "12px serif";
-                ctx.strokeText(text, x, y + height/2);
-            }
         </script>
         <style type="text/css">
             canvas { border: 1px solid black; }
         </style>
     </head>
-    <body onload="draw();">
-        <p>Example Slant</p>
-        <canvas id="slantCanvas", width="200" height="200">
-        </canvas>
+    <body >
+        <p>Select local CSV File:</p>
+        <input id="csvInput" type="file" onchange="readFile()">
+        <p>Example Slant, use only test data!</p>
     </body>
 </html>
