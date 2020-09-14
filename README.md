@@ -6,7 +6,7 @@ Copy the code and create a local file "index.html", open a web browser and open 
 
 ## Example Slant Graphic
 
-![Slant Graphic](slant1.png)
+![Slant Graphic](slant_1.png)
 
 ## Motivation
 
